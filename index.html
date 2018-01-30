@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>GarliCalculator</title>
+
+		<!-- Here's where you put your JavaScript -->
+
+		<script>
+			console.log("JavaScript is running!");
+
+			var miningDifficulty; // set our variable to be changed when we get our info.
+			var reward = 50;
+			var minedgarlic;
+			const difficultyAPI = "https://explorer.grlc-bakery.fun/api/getdifficulty"; // where our api call is going
+
+			fetch(difficultyAPI, {
+			method: 'get' // how we want to get this api.
+		}).then(function(getDifficultyFromAPI) { // where we contact the API and tell it what to do.
+			console.log("Was able to reach the explorer!");
+
+			return getDifficultyFromAPI.json(); // takes the data we got and turns it into json.
+		}).then(function(handleDifficultyFromAPI) {
+			// Yay! We've got our info and its in this function.
+
+			miningDifficulty = handleDifficultyFromAPI; // variable is set
+			console.log(miningDifficulty);
+
+			window.miningDifficulty; // sets this global. optional.
+		});
+
+		// Time to calculate mining difficulty.
+
+		function miningDifficultyCalc() {
+			var hashrate = document.getElementById("hashrate").value;
+			var multiplier = 10^(document.getElementById("multiplier").value);
+			var fee = (document.getElementById("fee").value)/100;
+
+			minedgarlic = (hashrate*multiplier)/(miningDifficulty*2^32)*(1-fee)*reward;
+			console.log(minedgarlic); // Just a little status check.
+
+			document.getElementById("mined/hr").innerHTML = minedgarlic * 3600;  //Converts GRLC/second to GRLC/hour, sets value in table
+			document.getElementById("mined/day").innerHTML = minedgarlic * 3600 * 24;
+			document.getElementById("mined/month").innerHTML = minedgarlic * 3600 * 24 * 30;
+			document.getElementById("mined/year").innerHTML = minedgarlic * 3600 * 24 * 365;
+		}
+		</script>
+	</head>
+
+	<body>
+		<!-- This is our form stuff -->
+
+		<h3>Hashrate</h3>
+		<input type="number" id="hashrate" placeholder="Your Hashrate">
+		<select id="multiplier">
+      		<option value="1" type="number">H/s</option>
+      		<option value="3" type="number">kH/s</option>
+      		<option value="6" type="number">MH/s</option>
+      		<option value="9" type="number">GH/s</option>
+    	</select>
+
+    	<!-- Time for the pool fee. -->
+
+    	<h3>Pool Fee (%)</h3>
+    	<input type="number" id="fee" placeholder="Pool Fee"><br>
+
+    	<input type="button" onclick="miningDifficultyCalc()" value="Calculate">
+
+    	<!-- Your table -->
+
+    	<table style="width:100%">
+  			<tr>
+    			<th></th>
+    			<th>Per Hour</th>
+    			<th>Per Day</th> 
+    			<th>Per Month</th>
+    			<th>Per Year</th>
+ 			</tr>
+
+  			<tr>
+   			 <td>GRLC</td>
+   			 	<td><p id="mined/hr"></p></td>
+   				<td><p id="mined/day"></p></td>
+   			 	<td><p id="mined/month"></p></td>
+   			 	<td><p id="mined/year"></p></td>
+ 			</tr>  
+		</table>
+	</body>
+</html>
