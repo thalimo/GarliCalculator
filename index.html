@@ -33,10 +33,10 @@
 
 		function miningDifficultyCalc() {
 			var hashrate = document.getElementById("hashrate").value;
-			var multiplier = 10^(document.getElementById("multiplier").value);
+			var multiplier = 10**(document.getElementById("multiplier").value);
 			var fee = (document.getElementById("fee").value)/100;
 
-			minedgarlic = (hashrate*multiplier)/(miningDifficulty*2^32)*(1-fee)*reward;
+			minedgarlic = (hashrate*multiplier)/(miningDifficulty*(2**32))*(1-fee)*reward;
 			console.log(minedgarlic); // Just a little status check.
 
 			document.getElementById("mined/hr").innerHTML = minedgarlic * 3600;  //Converts GRLC/second to GRLC/hour, sets value in table
@@ -53,7 +53,7 @@
 		<h3>Hashrate</h3>
 		<input type="number" id="hashrate" placeholder="Your Hashrate">
 		<select id="multiplier">
-      		<option value="1" type="number">H/s</option>
+      		<option value="0" type="number">H/s</option>
       		<option value="3" type="number">kH/s</option>
       		<option value="6" type="number">MH/s</option>
       		<option value="9" type="number">GH/s</option>
