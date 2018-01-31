@@ -9,6 +9,25 @@
 		<script>
 			console.log("JavaScript is running!");
 
+			var grlcprice; 
+			
+			const priceAPI = "https://api.coinmarketcap.com/v1/ticker/garlicoin/?convert=USD"; 
+
+			fetch(priceAPI, {
+			method: 'get' 
+		}).then(function(getpriceFromAPI) { 
+			console.log("Was able to reach the explorer!");
+
+			return getpriceFromAPI.json(); 
+		}).then(function(handlepriceFromAPI) {
+			
+
+			grlcprice = (handlepriceFromAPI[0].price_usd); 
+			console.log(grlcprice);
+
+			window.grlcprice; 
+		});
+      
 			var miningDifficulty; // set our variable to be changed when we get our info.
 			var reward = 50;
 			var minedgarlic;
@@ -31,18 +50,35 @@
 
 		// Time to calculate mining difficulty.
 
-		function miningDifficultyCalc() {
+		function earningsCalc() {
 			var hashrate = document.getElementById("hashrate").value;
 			var multiplier = 10**(document.getElementById("multiplier").value);
 			var fee = (document.getElementById("fee").value)/100;
+			var wattage = (document.getElementById("wattage").value)/1000;
+			var powercost = (document.getElementById("powercost").value);
 
-			minedgarlic = (hashrate*multiplier)/(miningDifficulty*(2**32))*(1-fee)*reward;
+			minedgarlic = ((hashrate*multiplier)/(miningDifficulty*(2**32))*(1-fee)*reward);
 			console.log(minedgarlic); // Just a little status check.
 
-			document.getElementById("mined/hr").innerHTML = minedgarlic * 3600;  //Converts GRLC/second to GRLC/hour, sets value in table
-			document.getElementById("mined/day").innerHTML = minedgarlic * 3600 * 24;
-			document.getElementById("mined/month").innerHTML = minedgarlic * 3600 * 24 * 30;
-			document.getElementById("mined/year").innerHTML = minedgarlic * 3600 * 24 * 365;
+			document.getElementById("grlc/hr").innerHTML = (minedgarlic * 3600).toFixed(8);  //Converts GRLC/second to GRLC/hour, sets value in table
+			document.getElementById("grlc/day").innerHTML = (minedgarlic * 3600 * 24).toFixed(8);
+			document.getElementById("grlc/month").innerHTML = (minedgarlic * 3600 * 24 * 30).toFixed(8);
+			document.getElementById("grlc/year").innerHTML = (minedgarlic * 3600 * 24 * 365).toFixed(8);
+
+			document.getElementById("rev/hr").innerHTML ="$" + (minedgarlic * 3600 * grlcprice).toFixed(2);  
+			document.getElementById("rev/day").innerHTML = "$" +(minedgarlic * 3600 * 24 * grlcprice).toFixed(2);
+			document.getElementById("rev/month").innerHTML ="$" + (minedgarlic * 3600 * 24 * 30 * grlcprice).toFixed(2);
+			document.getElementById("rev/year").innerHTML = "$" +(minedgarlic * 3600 * 24 * 365 * grlcprice).toFixed(2);
+
+			document.getElementById("cost/hr").innerHTML ="$" + (wattage * powercost).toFixed(2);  
+			document.getElementById("cost/day").innerHTML = "$" +(wattage * powercost * 24).toFixed(2);
+			document.getElementById("cost/month").innerHTML ="$" + (wattage * powercost * 24 * 30).toFixed(2);
+			document.getElementById("cost/year").innerHTML = "$" +(wattage * powercost * 24 * 365).toFixed(2);
+
+			document.getElementById("profit/hr").innerHTML ="$" + ((minedgarlic * 3600 * grlcprice)-(wattage * powercost)).toFixed(2);  
+			document.getElementById("profit/day").innerHTML = "$" + (((minedgarlic * 3600 * grlcprice)-(wattage * powercost))*24).toFixed(2);
+			document.getElementById("profit/month").innerHTML ="$" + (((minedgarlic * 3600 * grlcprice)-(wattage * powercost))*24*30).toFixed(2);
+			document.getElementById("profit/year").innerHTML = "$" + (((minedgarlic * 3600 * grlcprice)-(wattage * powercost))*24*365).toFixed(2);
 		}
 		</script>
 	</head>
@@ -61,10 +97,14 @@
 
     	<!-- Time for the pool fee. -->
 
-    	<h3>Pool Fee (%)</h3>
-    	<input type="number" id="fee" placeholder="Pool Fee"><br>
+    	<h3>Pool Fee</h3>
+		<input type="number" id="fee" placeholder="%"><br>
+		<h3>Pool Fee (%)</h3>
+		<input type="number" id="wattage" placeholder="Watts"><br>
+		<h3>Electricity Cost</h3>
+		<input type="number" id="powercost" placeholder="$/kWhr"><br>
 
-    	<input type="button" onclick="miningDifficultyCalc()" value="Calculate">
+    	<input type="button" onclick="earningsCalc()" value="Calculate">
 
     	<!-- Your table -->
 
@@ -79,10 +119,31 @@
 
   			<tr>
    			 <td>GRLC</td>
-   			 	<td><p id="mined/hr"></p></td>
-   				<td><p id="mined/day"></p></td>
-   			 	<td><p id="mined/month"></p></td>
-   			 	<td><p id="mined/year"></p></td>
+   			 	<td><p id="grlc/hr"></p></td>
+   				<td><p id="grlc/day"></p></td>
+   			 	<td><p id="grlc/month"></p></td>
+   			 	<td><p id="grlc/year"></p></td>
+			 </tr>  
+			 <tr>
+   			 <td>Revenue</td>
+   			 	<td><p id="rev/hr"></p></td>
+   				<td><p id="rev/day"></p></td>
+   			 	<td><p id="rev/month"></p></td>
+   			 	<td><p id="rev/year"></p></td>
+			 </tr>  
+			 <tr>
+   			 <td>Cost</td>
+   			 	<td><p id="cost/hr"></p></td>
+   				<td><p id="cost/day"></p></td>
+   			 	<td><p id="cost/month"></p></td>
+   			 	<td><p id="cost/year"></p></td>
+			 </tr>  
+			 <tr>
+   			 <td>Profit</td>
+   			 	<td><p id="profit/hr"></p></td>
+   				<td><p id="profit/day"></p></td>
+   			 	<td><p id="profit/month"></p></td>
+   			 	<td><p id="profit/year"></p></td>
  			</tr>  
 		</table>
 	</body>
